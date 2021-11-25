@@ -1,7 +1,7 @@
 name = "MatrixOracle"
 uuid = "54b37dc3-26e7-45d2-8235-fef8522a364c"
 authors = ["tomas votroubek <tomas.votroubek@outlook.com>"]
-version = "0.1.0"
+version = "0.1.1"
 
 [deps]
 JuMP = "4076af6c-e467-56ae-b986-b466b2749572"
