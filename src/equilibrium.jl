@@ -1,7 +1,13 @@
 using MosekTools
 using JuMP
 
-default_optimizer() = optimizer_with_attributes(Mosek.Optimizer, MOI.Silent() => true)
+function default_optimizer()
+	attributes = [
+		"MSK_IPAR_NUM_THREADS" => 1,
+		"QUIET" => true
+	]
+	optimizer_with_attributes(Mosek.Optimizer, attributes...)
+end
 
 subgame(payoff, pures) = view(payoff, pures...)
 
