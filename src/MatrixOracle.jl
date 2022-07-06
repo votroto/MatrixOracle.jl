@@ -1,8 +1,11 @@
 module MatrixOracle
 
+include("utils.jl")
 include("oracle.jl")
 include("equilibrium.jl")
 include("matrix_oracle.jl")
+include("zerosum_matrix_nash.jl")
+include("homotopy_matrix_nash.jl")
 include("iterators.jl")
 
 export matrix_oracle

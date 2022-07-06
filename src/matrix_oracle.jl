@@ -1,7 +1,7 @@
 import Base: iterate, IteratorSize, IsInfinite
 using LinearAlgebra
 
-random_init(payoff) = vcat.(rand.(axes(payoff)))
+random_init(payoff::NTuple) = vcat.(rand.(axes(first(payoff))))
 max_incentive((_, values, best)) = norm(best - values, Inf)
 
 struct MatrixOracleIterable{U, I}

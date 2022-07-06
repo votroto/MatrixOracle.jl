@@ -1,22 +1,20 @@
-PLAYER 1 picks the ROWS to MAXIMIZE his PAYOFF
+# Matrix Oracle (Experimental)
+A proof of concept generalization of the Double Oracle algorithm to solving
+matrix games -- including multiplayer general-sum games.
 
-```
-p = [
-	-1.11543   -0.909192   1.35002    0.555233
-	0.266551  -0.899694  -1.15107   -2.25091
-	0.170786   0.577513  -1.30527   -1.47238
-	0.133098   1.19972   -0.29065    0.353489
-   -0.143393   0.39024   -0.813464   0.95404
-]
+Player `i` chooses strategies on the `i`-th axis of the payoff matrix.
 
-# either fixed number of iterations
-(strategies, vals, best) = fixed_iters(matrix_oracle(p), 10)
+```julia
+p = rand(5, 4)
 
-# can also provide a starting point (column player starts with cols 1 and 3)
-(strategies, vals, best) = fixed_iters(matrix_oracle(p; init=([5], [1,3])), 10)
+# Solve a two-player zero-sum game using 10 iterations.
+(strategies, vals, best) = fixed_iters(matrix_oracle((p,)), 10)
 
-# or until ε-equilibrium
-cnt, (strategies, vals, best) = until_eps(matrix_oracle(p), 1e-3)
+# Ditto with a starting point (player 2 starts with cols 1 and 3).
+(strategies, vals, best) = fixed_iters(matrix_oracle((p,); init=([5], [1,3])), 10)
+
+# Stops once it finds an ε-equilibrium.
+cnt, (strategies, vals, best) = until_eps(matrix_oracle((p,)), 1e-3)
 
 @show cnt
 
@@ -26,4 +24,14 @@ cnt, (strategies, vals, best) = until_eps(matrix_oracle(p), 1e-3)
 @show vals[2]
 @show best[1]
 @show best[2]
+```
+
+You can also try solving multiplayer general-sum games
+```julia
+A = [9 0; 0 9;;; 0 3; 3 0]
+B = [8 0; 0 8;;; 0 4; 4 0]
+C = [12 0; 0 2;;; 0 6; 6 0]
+
+cnt, (strategies, vals, best) = until_eps(matrix_oracle((A, B, C)), 1e-3)
+
 ```
