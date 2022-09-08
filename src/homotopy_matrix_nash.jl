@@ -3,18 +3,6 @@ using TensorOperations: ncon
 using Base.Iterators: take, drop, flatten
 using LinearAlgebra: dot
 
-function _delete_at(xs, i)
-        xs[begin:end.!=i]
-end
-
-function _nash_ids(xs)
-        ncon_ids(i) = [(j == i) ? -j : j for j in xs]
-        ncon_js(i) = collect.(_delete_at(xs, i))
-        id_not_i(i) = xs[begin:end.!=i]
-
-        [(xs[i], id_not_i(i), ncon_ids(i), ncon_js(i)) for i in eachindex(xs)]
-end
-
 """this is ridiculous! Why can't they just provide a function for this?!"""
 function extract_solution(player_vars, sol)
         len = length(player_vars)
