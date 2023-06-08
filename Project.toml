@@ -1,7 +1,7 @@
 name = "MatrixOracle"
 uuid = "54b37dc3-26e7-45d2-8235-fef8522a364c"
 authors = ["tomas votroubek <tomas.votroubek@outlook.com>"]
-version = "0.2.0"
+version = "0.3.0"
 
 [deps]
 HomotopyContinuation = "f213a82b-91d6-5c5d-acf7-10f1c761b327"

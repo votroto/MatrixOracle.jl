@@ -1,65 +1,55 @@
 using HomotopyContinuation
-using TensorOperations: ncon
-using Base.Iterators: take, drop, flatten
-using LinearAlgebra: dot
+using Base.Iterators: flatten
 
-"""this is ridiculous! Why can't they just provide a function for this?!"""
-function extract_solution(player_vars, sol)
-        len = length(player_vars)
-        result = Array{Any}(undef, len)
-        rs = sol
-        for (p, vs) in enumerate(player_vars)
-                lvs = length(vs)
-                result[p] = take(rs, lvs)
-                rs = drop(rs, lvs)
-        end
-        (sol[end-len+1:end], collect.(result))
+function _hc_value(variable, system, path)
+        i = findfirst(isequal(variable), system.variables)
+        path.solution[i]
 end
 
-function is_plausible(strats; eps=1e-3)
-        sums_to_one(s) = isapprox(sum(s), 1; rtol=eps)
-        between_0_1(s) = all((i >= 0 - eps && i <= 1 + eps) for i in s)
+function extract_solution(s, player_vars, system, path)
+        _value(var) = real(_hc_value(var, system, path))
+
+        payoffs = _value.(s)
+        strats = [_value.(p) for p in player_vars]
+
+        (payoffs, strats)
+end
+
+function _is_strategy(strats; tol=1e-3)
+        sums_to_one(s) = isapprox(sum(s), 1; atol=tol)
+        between_0_1(s) = all((i >= 0 - tol) for i in s)
 
         all(between_0_1(s) && sums_to_one(s) for s in strats)
 end
 
-function is_br(payoffs, strats; eps=1e-3)
-        players = eachindex(payoffs)
-
-        pays = [
-                bug_ncon([payoffs[i], strats[js]...], [np, njs...])
-                for (i, js, np, njs) in _nash_ids(players)
-        ]
-        maxes = maximum.(pays)
-        actuals = dot.(pays, strats)
-
-        all(isapprox(actuals[i], maxes[i], rtol=eps) for i in players)
+function _is_solution(s, xs, system, path)
+        (_, x) = extract_solution(s, xs, system, path)
+        is_real(path) && _is_strategy(x)
 end
 
 function solve_homotopy(payoffs; start_system=:polyhedral)
-        ne_predicate((v, x)) = is_plausible(x) && is_br(payoffs, x)
         players = eachindex(payoffs)
+        actions = axes(first(payoffs))
 
-        x = [
-                [Variable(:x, d, i) for i in a]
-                for (d, a) in enumerate(axes(payoffs[1]))
-        ]
+        xs = [first(@var x[d, a]) for (d, a) in enumerate(actions)]
         @var s[players]
 
-        sum_to_one = [sum(x[p]) - 1 for p in players]
-        is_best = [
-                x[i] .* (s[i] .- bug_ncon([payoffs[i], x[js]...], [np, njs...]))
-                for (i, js, np, njs) in _nash_ids(players)
-        ]
+        pays = unilateral_payoffs(payoffs, xs, players)
 
-        vars = collect(flatten([x; s]))
-        G = System([sum_to_one; is_best...], variables=vars)
+        constr_simplex = [sum(xs[p]) - 1 for p in players]
+        constr_best_resp = [xs[i] .* (s[i] .- p) for (i, p) in enumerate(pays)]
 
-        res = HomotopyContinuation.solve(G; start_system)
-        outs = real_solutions(res)
-        sols = extract_solution.(Ref(x), outs)
+        variables = collect(flatten([xs; s]))
+        system = System([constr_simplex; constr_best_resp...], variables)
 
-        filter(ne_predicate, sols)
+        result = HomotopyContinuation.solve(system; 
+                show_progress=false,
+                compile=false,
+                tracker_options=TrackerOptions(parameters=:fast),
+                stop_early_cb=p->_is_solution(s, xs, system, p),
+                start_system)
+
+        [extract_solution(s, xs, system, p) for p in result.path_results]
 end
 
 function multiple_start_homotopy(payoffs)
@@ -70,6 +60,12 @@ function multiple_start_homotopy(payoffs)
         solve_homotopy(payoffs; start_system=:total_degree)
 end
 
+
+"""
+    nash_equilibrium(payoffs::NTuple)
+
+Compute the Nash equilibrium of a general matrix game using homotopy methods.
+"""
 function nash_equilibrium(payoffs::NTuple)
         payoffs |> multiple_start_homotopy |> first
 end
