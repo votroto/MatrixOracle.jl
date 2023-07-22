@@ -1,20 +1,12 @@
-using MosekTools
+using Gurobi
 using JuMP
-
-function _default_optimizer()
-	attributes = [
-		"MSK_IPAR_NUM_THREADS" => 1,
-		"QUIET" => true
-	]
-	optimizer_with_attributes(Mosek.Optimizer, attributes...)
-end
 
 """
     nash_equilibrium(payoffs::NTuple{1}; optimizer=_default_optimizer())
 
 Compute the nash equilibrium for a two-player zero-sum game.
 """
-function nash_equilibrium(payoffs::NTuple{1}; optimizer=_default_optimizer())
+function nash_equilibrium(payoffs::NTuple{1}; optimizer=_DEFAULT_OPTIMIZER)
 	payoff = only(payoffs)
 	axis = axes(payoff, 1)
 

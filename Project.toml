@@ -4,9 +4,11 @@ authors = ["tomas votroubek <tomas.votroubek@outlook.com>"]
 version = "0.3.0"
 
 [deps]
+Gurobi = "2e9cd046-0924-5485-92f1-d5272153d98b"
 HomotopyContinuation = "f213a82b-91d6-5c5d-acf7-10f1c761b327"
 JuMP = "4076af6c-e467-56ae-b986-b466b2749572"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 MosekTools = "1ec41992-ff65-5c91-ac43-2df89e9693a4"
 SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
+Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
 TensorOperations = "6aa20fa7-93e2-5fca-9bc0-fbd0db3c71a2"
