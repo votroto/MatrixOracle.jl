@@ -20,12 +20,5 @@ function iterate(mo::MatrixOracleIterable, pures=mo.init)
 	best, responses = oracle(mo.payoff, strategies)
 	extended = unique.(vcat.(pures, responses), dims=1)
 
-	worsts =  worst(mo.payoff, strategies)
-	for (i, e) in enumerate(extended)
-		if length(e) > rank(mo.payoff[(i-1)%length(mo.payoff)+1]) + 1
-			extended[i] = extended[i][begin:end .!= worsts[i]]
-		end
-	end
-
 	(strategies, values, best), extended
 end

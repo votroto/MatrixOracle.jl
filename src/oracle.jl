@@ -21,14 +21,3 @@ function oracle(payoffs::NTuple, strategies)
 	pays = unilateral_payoffs(payoffs, strategies, players)
 	unzip(findmax.(pays))
 end
-
-function worst(payoffs::NTuple, strategies)
-    players = eachindex(payoffs)
-	pays = unilateral_payoffs(payoffs, strategies, players)
-	argmin.(pays)
-end
-
-function worst(payoffs::NTuple{1}, strategies)
-	payoff = only(payoffs)
-	worst((payoff, -payoff), strategies)
-end
