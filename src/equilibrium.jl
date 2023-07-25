@@ -1,10 +1,12 @@
-using MosekTools
-using JuMP
+_subgames(payoffs, actions) = map(p -> view(p, actions...), payoffs)
 
-subgame(payoffs, pures) = map(p -> view(p, pures...), payoffs)
+"""
+    equilibrium(payoffs, actions)
 
-function equilibrium(payoffs, pures)
-	subproblem = subgame(payoffs, pures)
-	vals, probs = nash_equilibrium(subproblem)
-	vals, sparsevec.(pures, probs, size(first(payoffs)))
+Compute the player equilibrium strategies in a subgame restricted to actions.
+"""
+function equilibrium(payoffs, actions)
+    subproblem = _subgames(payoffs, actions)
+    vals, probs = nash_equilibrium(subproblem)
+    vals, sparsevec.(actions, probs, size(first(payoffs)))
 end

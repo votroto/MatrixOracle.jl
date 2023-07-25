@@ -1,20 +1,22 @@
 using SparseArrays
 
-function oracle(payoffs::NTuple{1}, strategies)
-	payoff = only(payoffs)
-	ps = (payoff, -payoff')
+"""
+oracle(payoffs::NTuple{1}, strategies)
 
-	es = ps .* reverse(strategies)
-	unzip(findmax.(es))
+Best response oracle for two-player zero-sum games. Returns the best 
+the best responses and the corresponding payoffs.
+"""
+function oracle(payoffs::NTuple{1}, strategies)
+    payoff = only(payoffs)
+    oracle((payoff, -payoff), strategies)
 end
 
+"""
+oracle(payoffs::NTuple, strategies)
+
+Best response oracle for general matrix games.
+"""
 function oracle(payoffs::NTuple, strategies)
-        players = eachindex(payoffs)
-
-	pays = [
-		bug_ncon([payoffs[i], strategies[js]...], [np, njs...])
-		for (i, js, np, njs) in _nash_ids(players)
-	]
-
-	unzip(findmax.(pays))
+    pays = unilateral_payoffs(payoffs, strategies)
+    unzip(findmax.(pays))
 end
