@@ -20,5 +20,7 @@ function iterate(mo::MatrixOracleIterable, pures=mo.init)
     best, responses = oracle(mo.payoff, strategies)
     extended = unique.(vcat.(pures, responses), dims=1)
 
-    (strategies, values, best), extended
+    pruned =  prune_support(mo.payoff, strategies, extended)
+
+    (strategies, values, best), pruned
 end
