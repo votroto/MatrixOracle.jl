@@ -1,5 +1,7 @@
 using JuMP
 
+# Extensions for lifting multilinear expressions into quadratics.
+
 import Base.:*
 Base.:*(a::GenericQuadExpr, b::GenericQuadExpr) = jump_quadratic_product(a, b)
 Base.:*(a::GenericAffExpr, b::GenericQuadExpr) = jump_quadratic_product(a, b)

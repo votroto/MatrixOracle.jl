@@ -1,13 +1,16 @@
 module MatrixOracle
 
-include("utils.jl")
-include("oracle.jl")
+using JuMP
+using Gurobi
+using SparseArrays
+using LinearAlgebra
+using Symbolics
+
 include("equilibrium.jl")
+include("oracle.jl")
 include("matrix_oracle.jl")
-include("zerosum_matrix_nash.jl")
 include("jump_extensions.jl")
-include("multilinear_matrix_nash.jl")
-include("iterators.jl")
+include("equilibrium_impl.jl")
 
 export matrix_oracle
 export fixed_iters

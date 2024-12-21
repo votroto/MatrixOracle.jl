@@ -1,5 +1,11 @@
 import Base: iterate, IteratorSize, IsInfinite
+using Base.Iterators: dropwhile, drop
 using LinearAlgebra
+
+dropwhile_enumerate(pred, itr) = dropwhile(x -> pred(x[2]), enumerate(itr))
+
+until_eps(xs, gap) = first(dropwhile_enumerate(x -> max_incentive(x) > gap, xs))
+fixed_iters(d, i) = first(drop(d, i))
 
 random_init(payoff::NTuple) = vcat.(rand.(axes(first(payoff))))
 max_incentive((_, values, best)) = norm(best - values, Inf)

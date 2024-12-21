@@ -43,7 +43,7 @@ end
     A = [9 0; 0 9;;; 0 3; 3 0]
     B = [8 0; 0 8;;; 0 4; 4 0]
     C = [12 0; 0 2;;; 0 6; 6 0]
-    
+
     iters, (strats, vals, subopt) = until_eps(matrix_oracle((A, B, C)), 1e-3)
 
     @test iters <= sum(size(A))

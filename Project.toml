@@ -1,13 +1,11 @@
 name = "MatrixOracle"
 uuid = "54b37dc3-26e7-45d2-8235-fef8522a364c"
 authors = ["tomas votroubek <tomas.votroubek@outlook.com>"]
-version = "0.3.0"
+version = "0.4.0"
 
 [deps]
-HomotopyContinuation = "f213a82b-91d6-5c5d-acf7-10f1c761b327"
+Gurobi = "2e9cd046-0924-5485-92f1-d5272153d98b"
 JuMP = "4076af6c-e467-56ae-b986-b466b2749572"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
-SCIP = "82193955-e24f-5292-bf16-6f2c5261a85f"
 SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
-TensorOperations = "6aa20fa7-93e2-5fca-9bc0-fbd0db3c71a2"

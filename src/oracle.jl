@@ -1,15 +1,18 @@
-using SparseArrays
+# Thanks, ivirshup! Julia, please implement.
+unzip(a) = map(x -> getfield.(a, x), fieldnames(eltype(a)))
+
 
 """
 oracle(payoffs::NTuple{1}, strategies)
 
-Best response oracle for two-player zero-sum games. Returns the best 
+Best response oracle for two-player zero-sum games. Returns the best
 the best responses and the corresponding payoffs.
 """
 function oracle(payoffs::NTuple{1}, strategies)
     payoff = only(payoffs)
     oracle((payoff, -payoff), strategies)
 end
+
 
 """
 oracle(payoffs::NTuple, strategies)
