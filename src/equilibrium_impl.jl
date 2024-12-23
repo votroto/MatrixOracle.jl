@@ -20,29 +20,22 @@ function nash_equilibrium(
     payoffs::NTuple{N,AbstractArray{T,N}};
     optimizer=_silent_optimizer()
 ) where {T,N}
-    _simplify(expr) = Symbolics.simplify(expr; expand=true)
-    _eval_sym(expr, dict) = Symbolics.value.(Symbolics.substitute(expr, dict))
-    _simplex_var() = @variable(m; lower_bound=0, upper_bound=1, start=0)
+    _simplex_var(N) = @variable(m; lower_bound=0, upper_bound=1, start=1 / N)
 
     players = eachindex(payoffs)
     actions = axes(first(payoffs))
 
     m = Model(optimizer)
 
-    x = ntuple(i -> [_simplex_var() for a in actions[i]], N)
+    x = ntuple(i -> [_simplex_var(N) for a in actions[i]], N)
     @variable(m, p[players])
 
-    X = ntuple(i -> [Symbolics.variable(:X, i, a) for a in actions[i]], N)
-    var_map = Dict(vcat(X...) .=> vcat(x...))
-
-    brfs_sym = _simplify(unilateral_payoffs(payoffs, X))
-    brfsX_sym = [_simplify(dot(brfs_sym[i], X[i])) for i in players]
-
-    brfs = map(e -> _eval_sym(e, var_map), brfs_sym)
-    brfsX = map(e -> _eval_sym(e, var_map), brfsX_sym)
+    brfs = ntuple(p -> zeros(QuadExpr, actions[p]), N)
+    unilateral_payoffs!(brfs, payoffs, x)
+    sum_payoff = sum(brfs[i][a] * x[i][a] for i in players for a in actions[i])
 
     @constraint(m, [i = players], brfs[i] .<= p[i])
-    @constraint(m, sum(brfsX) >= sum(p))
+    @constraint(m, sum_payoff >= sum(p))
     @constraint(m, [i = players], sum(x[i]) == 1)
 
     optimize!(m)

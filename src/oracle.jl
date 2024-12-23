@@ -15,9 +15,15 @@ oracle(payoffs::NTuple, strategies)
 
 Best response oracle for general matrix games.
 """
-function oracle(payoffs::NTuple{N}, strategies) where {N}
-    payoffs = unilateral_payoffs(payoffs, strategies)
-    found_maxes = ntuple(i -> findmax(payoffs[i]), N)
+function oracle(
+    payoffs::NTuple{N,AbstractArray{P}},
+    strategies::NTuple{N, AbstractArray{S}}
+) where {N, P, S}
+    PS = promote_type(P, S)
+    brfs = ntuple(p -> zeros(PS, length(strategies[p])), N)
+    unilateral_payoffs!(brfs, payoffs, strategies)
+
+    found_maxes = ntuple(i -> findmax(brfs[i]), N)
     xss = ntuple(i -> found_maxes[i][1], N)
     iss = ntuple(i -> found_maxes[i][2], N)
 

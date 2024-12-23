@@ -4,7 +4,6 @@ using JuMP
 using Gurobi
 using SparseArrays
 using LinearAlgebra
-using Symbolics
 
 include("equilibrium.jl")
 include("oracle.jl")

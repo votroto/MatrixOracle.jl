@@ -3,13 +3,12 @@ unilateral_payoffs(payoffs::NTuple, strategies::NTuple; players)
 
 Computes the payoffs that each player could get by unilateral deviation.
 """
-function unilateral_payoffs(
-    payoffs::NTuple{N,AbstractArray{P}},
-    strategies::NTuple{N, AbstractArray{S}};
+function unilateral_payoffs!(
+    result::NTuple{N},
+    payoffs::NTuple{N},
+    strategies::NTuple{N};
     players=eachindex(payoffs)
-) where {N, P, S}
-    PS = promote_type(P, S)
-    E = ntuple(p -> zeros(PS, length(strategies[p])), N)
+) where {N}
     for p in players
         for i in CartesianIndices(payoffs[p])
             temp = payoffs[p][i]
@@ -19,10 +18,10 @@ function unilateral_payoffs(
                 end
                 temp *= strategies[z][i.I[z]]
             end
-            E[p][i.I[p]] += temp
+            result[p][i.I[p]] += temp
         end
     end
-    E
+    result
 end
 
 
