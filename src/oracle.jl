@@ -1,7 +1,3 @@
-# Thanks, ivirshup! Julia, please implement.
-unzip(a) = map(x -> getfield.(a, x), fieldnames(eltype(a)))
-
-
 """
 oracle(payoffs::NTuple{1}, strategies)
 
@@ -19,7 +15,11 @@ oracle(payoffs::NTuple, strategies)
 
 Best response oracle for general matrix games.
 """
-function oracle(payoffs::NTuple, strategies)
-    pays = unilateral_payoffs(payoffs, strategies)
-    unzip(findmax.(pays))
+function oracle(payoffs::NTuple{N}, strategies) where {N}
+    payoffs = unilateral_payoffs(payoffs, strategies)
+    found_maxes = ntuple(i -> findmax(payoffs[i]), N)
+    xss = ntuple(i -> found_maxes[i][1], N)
+    iss = ntuple(i -> found_maxes[i][2], N)
+
+    xss, iss
 end

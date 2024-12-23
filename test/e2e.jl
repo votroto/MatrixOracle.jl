@@ -21,6 +21,18 @@ end
     @test iters <= sum(MN)
 end
 
+@testset "zero-sum agrees with general-sum" begin
+    A1 = [3 2 3; 1 4 0]
+
+    oracle = matrix_oracle((A1,))
+    stratsz, valsz, _ = fixed_iters(oracle, 6)
+
+    oracle = matrix_oracle((A1, -A1))
+    stratsg, valsg, _ = fixed_iters(oracle, 6)
+
+    @test isapprox(collect(valsz), collect(valsg), atol=1e-3)
+end
+
 @testset "3x3 guess" begin
     guess = [0 1 4; 1 0 1; 4 1 0]
 
@@ -33,7 +45,7 @@ end
     expected_s2 = [0.0, 1.0, 0.0]
 
     clamped_s1 = clamp.(s1, expected_min, expected_max)
-    @test isapprox(values, expected_values, atol=1e-3)
+    @test isapprox(collect(values), expected_values, atol=1e-3)
     @test isapprox(sum(s1), 1, atol=1e-3)
     @test (isapprox(s1, clamped_s1, atol=1e-3))
     @test isapprox(s2, expected_s2, atol=1e-3)

@@ -1,7 +1,7 @@
 name = "MatrixOracle"
 uuid = "54b37dc3-26e7-45d2-8235-fef8522a364c"
 authors = ["tomas votroubek <tomas.votroubek@outlook.com>"]
-version = "0.4.0"
+version = "0.5.0"
 
 [deps]
 Gurobi = "2e9cd046-0924-5485-92f1-d5272153d98b"
