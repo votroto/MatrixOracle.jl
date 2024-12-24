@@ -8,7 +8,6 @@ using LinearAlgebra
 include("equilibrium.jl")
 include("oracle.jl")
 include("matrix_oracle.jl")
-include("jump_extensions.jl")
 include("equilibrium_impl.jl")
 
 export matrix_oracle

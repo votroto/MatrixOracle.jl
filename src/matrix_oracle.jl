@@ -7,7 +7,7 @@ dropwhile_enumerate(pred, itr) = dropwhile(x -> pred(x[2]), enumerate(itr))
 until_eps(xs, gap) = first(dropwhile_enumerate(x -> max_incentive(x...) > gap, xs))
 fixed_iters(d, i) = first(drop(d, i))
 
-random_init(payoff::NTuple) = vcat.(rand.(axes(first(payoff))))
+random_init(payoffs::NTuple) = vcat.(rand.(axes(first(payoffs))))
 function max_incentive(_, values::NTuple{N,F}, best::NTuple{N,F}) where {N,F}
     incentive_max = typemin(F)
     for i in eachindex(values)

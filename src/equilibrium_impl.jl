@@ -30,7 +30,7 @@ function nash_equilibrium(
     x = ntuple(i -> [_simplex_var(N) for a in actions[i]], N)
     @variable(m, p[players])
 
-    brfs = ntuple(p -> zeros(QuadExpr, actions[p]), N)
+    brfs = ntuple(p -> zeros(NonlinearExpr, actions[p]), N)
     unilateral_payoffs!(brfs, payoffs, x)
     sum_payoff = sum(brfs[i][a] * x[i][a] for i in players for a in actions[i])
 
