@@ -19,7 +19,12 @@ function oracle(
     maxes, acts
 end
 
-function oracle(payoffs::NTuple{1}, strategies)
-    payoff = only(payoffs)
-    oracle((payoff, -payoff), strategies)
+function oracle(
+    payoffs::NTuple{1,AbstractArray},
+    strategies::NTuple{2,AbstractArray}
+)
+    max1, act1 = findmax(payoffs[1] * strategies[2])
+    min2, act2 = findmin(payoffs[1]' * strategies[1])
+
+    (max1, -min2), (act1, act2)
 end

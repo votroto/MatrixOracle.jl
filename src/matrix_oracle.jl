@@ -2,12 +2,27 @@ import Base: iterate, IteratorSize, IsInfinite
 using Base.Iterators: dropwhile, drop
 using LinearAlgebra
 
-dropwhile_enumerate(pred, itr) = dropwhile(x -> pred(x[2]), enumerate(itr))
 
-until_eps(xs, gap) = first(dropwhile_enumerate(x -> max_incentive(x...) > gap, xs))
-fixed_iters(d, i) = first(drop(d, i))
+dropwhile_counting(pred, itr) = dropwhile(x -> pred(x[2]), enumerate(itr))
 
-random_init(payoffs::NTuple) = vcat.(rand.(axes(first(payoffs))))
+
+"""
+Run the iterator `xs` until the first iteration where the exploitability is
+below or equal to `gap`.
+"""
+until_eps(xs, gap) = first(dropwhile_counting(x -> max_incentive(x...) > gap, xs))
+
+
+"""
+Run the iterator `xs` for a fixed number of iterations `i`.
+"""
+fixed_iters(xs, i) = first(drop(xs, i))
+
+
+random_init(payoffs::NTuple{N}) where {N} = ntuple(i -> [rand(axes(payoffs[i], i))], N)
+random_init(payoffs::NTuple{1}) = random_init((only(payoffs), only(payoffs)))
+
+
 function max_incentive(_, values::NTuple{N,F}, best::NTuple{N,F}) where {N,F}
     incentive_max = typemin(F)
     for i in eachindex(values)
@@ -18,6 +33,7 @@ function max_incentive(_, values::NTuple{N,F}, best::NTuple{N,F}) where {N,F}
     end
     incentive_max
 end
+
 
 struct MatrixOracleIterable{U,I}
     payoff::U

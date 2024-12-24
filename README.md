@@ -1,9 +1,10 @@
-# Matrix Oracle (Experimental)
-A proof of concept generalization of the Double Oracle algorithm to solving
-matrix games -- including multiplayer general-sum games.
+# Matrix Oracle
+Generalized Double Oracle algorithm for multiplayer strategic games.
 
-Player `i` chooses strategies on the `i`-th axis of the payoff matrix.
+Actions available to player `i` correspond to the indices along the `i`-th axis of the payoff tensor.
 
+## Zero-Sum Games
+Specify a single matrix to treat the game as zero-sum.
 ```julia
 p = rand(5, 4)
 
@@ -17,7 +18,8 @@ p = rand(5, 4)
 iters, (strats, vals, subopt) = until_eps(matrix_oracle((p,)), 1e-3)
 ```
 
-You can also try solving multiplayer general-sum games
+## General-Sum Games
+Multiplayer general-sum games are possible, as well:
 ```julia
 A = [9 0; 0 9;;; 0 3; 3 0]
 B = [8 0; 0 8;;; 0 4; 4 0]
