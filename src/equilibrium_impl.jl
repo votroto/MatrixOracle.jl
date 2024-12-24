@@ -8,13 +8,15 @@ end
 
 
 _default_optimizer() = Gurobi.Optimizer(GRB_ENV_REF[])
+
 _silent_optimizer() = optimizer_with_attributes(_default_optimizer, MOI.Silent() => true)
 
 
 """
     nash_equilibrium(payoffs)
 
-Computes the values and NE strategies for a multi-player general sum game.
+Finds a nash equilibrium of a strategic game. Returns the payoffs and the
+corresponding strategies.
 """
 function nash_equilibrium(
     payoffs::NTuple{N,AbstractArray{T,N}};
@@ -27,41 +29,39 @@ function nash_equilibrium(
 
     m = Model(optimizer)
 
+    pay_ub = ntuple(i -> maximum(payoffs[i]), N)
+    pay_lb = ntuple(i -> minimum(payoffs[i]), N)
     x = ntuple(i -> [_simplex_var(N) for a in actions[i]], N)
-    @variable(m, p[players])
+    @variable(m, w[i=players], lower_bound = pay_lb[i], upper_bound = pay_ub[i])
 
-    brfs = ntuple(p -> zeros(NonlinearExpr, actions[p]), N)
+    brfs = ntuple(i -> zeros(NonlinearExpr, actions[i]), N)
     unilateral_payoffs!(brfs, payoffs, x)
-    sum_payoff = sum(brfs[i][a] * x[i][a] for i in players for a in actions[i])
 
-    @constraint(m, [i = players], brfs[i] .<= p[i])
-    @constraint(m, sum_payoff >= sum(p))
+    sum_payoff = sum(brfs[i][a] * x[i][a] for i in players for a in actions[i])
+    @constraint(m, [i = players], brfs[i] .<= w[i])
+    @constraint(m, sum_payoff >= sum(w))
     @constraint(m, [i = players], sum(x[i]) == 1)
 
     optimize!(m)
 
-    values = ntuple(i -> value.(p[i]), N)
+    values = ntuple(i -> value.(w[i]), N)
     strats = ntuple(i -> value.(x[i]), N)
 
     values, strats
 end
 
-
-"""
-    nash_equilibrium(payoffs::NTuple{2}; optimizer=_default_optimizer())
-
-Compute the nash equilibrium for a two-player general-sum game.
-"""
 function nash_equilibrium(
     payoffs::NTuple{2,AbstractMatrix};
     optimizer=_silent_optimizer()
 )
     m = Model(optimizer)
 
+    pay_ub = ntuple(i -> maximum(payoffs[i]), 2)
+    pay_lb = ntuple(i -> minimum(payoffs[i]), 2)
     nx, ny = size(payoffs[1])
     @variable(m, xs[1:nx], lower_bound = 0, upper_bound = 1)
     @variable(m, ys[1:ny], lower_bound = 0, upper_bound = 1)
-    @variable(m, w[i=1:2], lower_bound = minimum(payoffs[i]), upper_bound = maximum(payoffs[i]))
+    @variable(m, w[i=1:2], lower_bound = pay_lb[i], upper_bound = pay_ub[i])
 
     @constraint(m, sum(xs) == 1)
     @constraint(m, sum(ys) == 1)
@@ -75,12 +75,6 @@ function nash_equilibrium(
     (value(w[1]), value(w[2])), (value.(xs), value.(ys))
 end
 
-
-"""
-    nash_equilibrium(payoffs::NTuple{1}; optimizer=_default_optimizer())
-
-Compute the nash equilibrium for a two-player zero-sum game.
-"""
 function nash_equilibrium(
     payoffs::NTuple{1,AbstractMatrix};
     optimizer=_silent_optimizer()

@@ -25,11 +25,6 @@ function unilateral_payoffs!(
 end
 
 
-"""
-    _subgames(payoffs, actions)
-
-Construct subgames restricted to actions.
-"""
 _subgames(payoffs, actions) = map(p -> view(p, actions...), payoffs)
 
 
